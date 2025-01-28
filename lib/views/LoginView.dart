@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:restlogin/views/login.dart';
 
-class Loginview extends StatelessWidget {
-  const Loginview({super.key});
+class LoginView extends StatelessWidget {
+  const LoginView({super.key});
 
   @override
   Widget build(BuildContext context) {

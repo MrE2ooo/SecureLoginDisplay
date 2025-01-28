@@ -1,25 +1,41 @@
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:restlogin/colors.dart';
-import 'package:restlogin/repos/loginrepo.dart';
-import 'package:restlogin/repos/loginrepo_impl.dart';
-
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:restlogin/manger/Login_cubit/login_cubit_cubit.dart';
+import 'package:restlogin/views/homepage.dart'; 
 
 class LoginController extends GetxController {
   TextEditingController username = TextEditingController();
   TextEditingController password = TextEditingController();
 
-  // Replace AuthenticationService with LoginRepoImpl
-  final LoginRepo _authService = LoginRepoImpl();
-
   Future<void> submit(BuildContext context) async {
     if (context.mounted) {
-      await _authService.submit(
-        context: context,
-        username: username,
-        password: password,
-        showMessage: showMessage,
+      // Access the LoginCubitCubit using BlocProvider
+      final loginCubit = BlocProvider.of<LoginCubitCubit>(context);
+
+      // Trigger the login process
+      loginCubit.login(
+        username: username.text.trim(),
+        password: password.text.trim(),
       );
+
+      // Listen to the cubit's state changes
+      loginCubit.stream.listen((state) {
+        if (!context.mounted) return; // Check if the context is still valid
+
+        if (state is LoginSuccess) {
+          // Navigate to the home page on successful login
+          Get.to(() => HomePage(userDetails: state.userDetails));
+        } else if (state is LoginFailure) {
+          // Show error message on failure
+          showMessage(
+            context: context,
+            title: "Login Status",
+            message: state.message,
+          );
+        }
+      });
     }
   }
 
@@ -28,6 +44,8 @@ class LoginController extends GetxController {
     required String title,
     required String message,
   }) {
+    if (!context.mounted) return; // Check if the context is still valid
+
     showCupertinoDialog(
       context: context,
       builder: (context) => CupertinoAlertDialog(
