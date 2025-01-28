@@ -51,7 +51,7 @@ class Login extends StatelessWidget {
                     ),
                     onPressed: () async {
                       
-                     await controller.submit(context);
+                     controller.submit(context);
                     },
                     child: const Text(
                       "Login",
